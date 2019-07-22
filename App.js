@@ -4,6 +4,7 @@ import {
 	Text,
 	TextInput,
 	View,
+	Image,
 	Button,
 	TouchableOpacity,
 	Dimensions,
@@ -161,16 +162,23 @@ export default class Example extends Component {
 
 						<View style={styles.optionsContainer}>
 							<TouchableOpacity
-								style={styles.optionButton}
+								style={[styles.optionButton,{backgroundColor: "#ea4e3d"}]}
 								onPress={this._onEndButtonPress}
 							>
-								<Text style={{ fontSize: 12 }}>End</Text>
+								<Image
+									style={{width: 24, height: 24}}
+									source={require('./src/images/close.png')}
+								/>
 							</TouchableOpacity>
 							<TouchableOpacity
 								style={styles.optionButton}
 								onPress={this._onMuteButtonPress}
 							>
-								<Text style={{ fontSize: 12 }}>
+								<Image
+									style={{width: 24, height: 24}}
+									source={require('./src/images/mute.png')}
+								/>
+								<Text style={{ fontSize: 10, color: "white" }}>
 									{this.state.isAudioEnabled
 										? "Mute"
 										: "Unmute"}
@@ -180,7 +188,10 @@ export default class Example extends Component {
 								style={styles.optionButton}
 								onPress={this._onFlipButtonPress}
 							>
-								<Text style={{ fontSize: 12 }}>Flip</Text>
+								<Image
+									style={{width: 34, height: 34}}
+									source={require('./src/images/camera.png')}
+								/>
 							</TouchableOpacity>
 						</View>
 					</View>
@@ -288,7 +299,7 @@ const styles = StyleSheet.create({
 		marginLeft: 10,
 		marginRight: 10,
 		borderRadius: 100 / 2,
-		backgroundColor: "grey",
+		backgroundColor: 'rgba(52, 52, 52, 0.2)',
 		justifyContent: "center",
 		alignItems: "center"
 	}
