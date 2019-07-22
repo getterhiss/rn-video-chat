@@ -22,8 +22,7 @@ export default class Example extends Component {
 		isAudioEnabled: true,
 		isVideoEnabled: true,
 		status: "disconnected",
-		participants: new Map(),
-		videoTracks: new Map(),
+		videoTracks: [],
 		roomName: "getter"
 	};
 
@@ -40,7 +39,7 @@ export default class Example extends Component {
 
 	_onConnectButtonPress = () => {
 		let token;
-		fetch("http://192.168.1.113:3000/token")
+		fetch("http://192.168.1.117:3000/token")
 			.then(response => response.json())
 			.then(data => {
 				console.log("Data:", data);
@@ -84,33 +83,30 @@ export default class Example extends Component {
 	_onParticipantAddedVideoTrack = ({ participant, track }) => {
 		console.log("onParticipantAddedVideoTrack: ", participant, track);
 
-		this.setState({
-			status: "connected",
-			videoTracks: new Map([
-				...this.state.videoTracks,
-				[
-					track.trackSid,
-					{
-						participantSid: participant.sid,
-						videoTrackSid: track.trackSid
-					}
-				]
-			])
-		});
+		let videoTracks = [...this.state.videoTracks, {
+			participantSid: participant.sid,
+			videoTrackSid: track.trackSid
+		}];
+		console.log('_onParticipantAddedVideoTrack', videoTracks);
+
+		this.setState({status: "connected", videoTracks});
 	};
 
 	_onParticipantRemovedVideoTrack = ({ participant, track }) => {
 		console.log("onParticipantRemovedVideoTrack: ", participant, track);
 
-		const videoTracks = this.state.videoTracks;
-		videoTracks.delete(track.trackSid);
-
-		this.setState({
-			videoTracks: new Map([...videoTracks])
+		let videoTracks = this.state.videoTracks.filter(function(value, index, arr){
+    		return value.videoTrackSid !== track.trackSid
 		});
+		console.log('_onParticipantRemovedVideoTrack', videoTracks);
+
+		this.setState({videoTracks});
 	};
 
 	render() {
+		
+		let vt = this.state.videoTracks;
+
 		return (
 			<View style={styles.container}>
 				{this.state.status === "disconnected" && (
@@ -133,27 +129,26 @@ export default class Example extends Component {
 					</View>
 				)}
 
-				{(this.state.status === "connected" ||
-					this.state.status === "connecting") && (
+				{(this.state.status === "connected" || this.state.status === "connecting") && (
 					<View style={styles.callContainer}>
-						{this.state.status === "connected" && (
-							<View>
-								{Array.from(
-									this.state.videoTracks,
-									([trackSid, trackIdentifier]) => {
-										return (
-											<TwilioVideoParticipantView
-												style={styles.remoteVideo}
-												key={trackSid}
-												trackIdentifier={
-													trackIdentifier
-												}
-											/>
-										);
-									}
-								)}
-							</View>
-						)}
+
+						{ vt.length >= 1 && <TwilioVideoParticipantView
+							style={styles.mainVideo}
+							key={vt[0].videoTrackSid}
+							trackIdentifier={vt[0]}
+						/>}
+
+						{ vt.length === 2 && <TwilioVideoParticipantView
+							style={[styles.videoView, styles.smallVideo]}
+							key={vt[1].videoTrackSid}
+							trackIdentifier={vt[1]}
+						/>}
+
+						<TwilioVideoLocalView
+							enabled={true}
+							style={[styles.videoView, styles.localVideo]}
+						/>
+
 						<View style={styles.optionsContainer}>
 							<TouchableOpacity
 								style={styles.optionButton}
@@ -177,10 +172,6 @@ export default class Example extends Component {
 							>
 								<Text style={{ fontSize: 12 }}>Flip</Text>
 							</TouchableOpacity>
-							<TwilioVideoLocalView
-								enabled={true}
-								style={styles.localVideo}
-							/>
 						</View>
 					</View>
 				)}
@@ -190,12 +181,8 @@ export default class Example extends Component {
 					onRoomDidConnect={this._onRoomDidConnect}
 					onRoomDidDisconnect={this._onRoomDidDisconnect}
 					onRoomDidFailToConnect={this._onRoomDidFailToConnect}
-					onParticipantAddedVideoTrack={
-						this._onParticipantAddedVideoTrack
-					}
-					onParticipantRemovedVideoTrack={
-						this._onParticipantRemovedVideoTrack
-					}
+					onParticipantAddedVideoTrack={this._onParticipantAddedVideoTrack}
+					onParticipantRemovedVideoTrack={this._onParticipantRemovedVideoTrack}
 				/>
 			</View>
 		);
@@ -238,25 +225,33 @@ const styles = StyleSheet.create({
 	button: {
 		marginTop: 100
 	},
-	localVideo: {
+	videoView: {
 		flex: 1,
-		width: width/3,
-		height: height/3,
+		width: 125,
+		height: 225,
 		position: "absolute",
-		right: 0,
-		bottom: 0
+		backgroundColor: "gray",
+		borderRadius: 5,
+		borderColor: "pink",
+		borderWidth: 1,
+	},
+	localVideo: {
+		right: 10,
+		bottom: 10,
+	},
+	smallVideo: {
+		left: 10,
+		top: 10,
 	},
 	remoteGrid: {
 		flex: 1,
 		flexDirection: "row",
 		flexWrap: "wrap"
 	},
-	remoteVideo: {
-		marginTop: 20,
-		marginLeft: 0,
-		marginRight: 0,
+	mainVideo: {
+		margin: 0,
 		width: width,
-		height: height
+		height: height,
 	},
 	optionsContainer: {
 		position: "absolute",
@@ -264,7 +259,7 @@ const styles = StyleSheet.create({
 		bottom: 0,
 		right: 0,
 		height: 100,
-		backgroundColor: "blue",
+		backgroundColor: "transparent",
 		flexDirection: "row",
 		alignItems: "center"
 	},
