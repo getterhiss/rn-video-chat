@@ -58,6 +58,12 @@ export default class Example extends Component {
 		this.refs.twilioVideo.disconnect();
 	};
 
+	_onSwapPress = () => {
+		let { videoTracks } = this.state;
+		videoTracks = videoTracks.reverse(); 
+		this.setState({videoTracks});
+	};
+
 	_onMuteButtonPress = () => {
 		this.refs.twilioVideo
 			.setLocalAudioEnabled(!this.state.isAudioEnabled)
@@ -138,11 +144,15 @@ export default class Example extends Component {
 							trackIdentifier={vt[0]}
 						/>}
 
-						{ vt.length === 2 && <TwilioVideoParticipantView
-							style={[styles.videoView, styles.smallVideo]}
-							key={vt[1].videoTrackSid}
-							trackIdentifier={vt[1]}
-						/>}
+						{ vt.length === 2 && <TouchableOpacity
+							style={[styles.videoSwap]}
+							onPress={this._onSwapPress}>
+								<TwilioVideoParticipantView
+									style={[styles.videoView, styles.smallVideo]}
+									key={vt[1].videoTrackSid}
+									trackIdentifier={vt[1]}
+								/>
+						</TouchableOpacity>}
 
 						<TwilioVideoLocalView
 							enabled={true}
@@ -225,23 +235,32 @@ const styles = StyleSheet.create({
 	button: {
 		marginTop: 100
 	},
+	videoSwap: {
+		flex: 1,
+		width: 110,
+		height: 280,
+		position: "absolute",
+		left: 5,
+		top: 5,
+		// borderRadius: 5,
+	},
 	videoView: {
 		flex: 1,
-		width: 125,
-		height: 225,
+		width: 110,
+		height: 180,
 		position: "absolute",
-		backgroundColor: "gray",
-		borderRadius: 5,
-		borderColor: "pink",
-		borderWidth: 1,
+		// backgroundColor: "gray",
+		// borderRadius: 5,
+		// borderColor: "pink",
+		// borderWidth: 1,
 	},
 	localVideo: {
-		right: 10,
-		bottom: 10,
+		right: 5,
+		bottom: 5,
 	},
 	smallVideo: {
-		left: 10,
-		top: 10,
+		left: 5,
+		top: 5,
 	},
 	remoteGrid: {
 		flex: 1,
