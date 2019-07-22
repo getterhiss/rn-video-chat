@@ -70,7 +70,7 @@ export default class Example extends Component {
 	};
 
 	_onRoomDidDisconnect = ({ roomName, error }) => {
-		console.log("ERROR: ", error);
+		console.log("Room disconnected: ", roomName);
 
 		this.setState({ status: "disconnected" });
 	};
@@ -116,6 +116,7 @@ export default class Example extends Component {
 				{this.state.status === "disconnected" && (
 					<View>
 						<Text style={styles.welcome}>Group Video Chat</Text>
+						<Text style={styles.roomName}>Room name</Text>
 						<TextInput
 							style={styles.input}
 							autoCapitalize="none"
@@ -217,27 +218,33 @@ const styles = StyleSheet.create({
 	welcome: {
 		fontSize: 30,
 		textAlign: "center",
-		paddingTop: 40
-	},
+		paddingTop: height*0.15
+    },
+    roomName: {
+        fontSize: 16,
+        textAlign: "center",
+        paddingTop: 40
+    },
 	input: {
 		height: 50,
 		borderWidth: 1,
 		marginRight: 70,
 		marginLeft: 70,
-		marginTop: 50,
+		marginTop: 10,
 		textAlign: "center",
-		backgroundColor: "white"
+        backgroundColor: "white",
+        fontSize: 18
 	},
 	button: {
 		marginTop: 100
 	},
 	localVideo: {
 		flex: 1,
-		width: 150,
-		height: 250,
+		width: width/3,
+		height: height/3,
 		position: "absolute",
-		right: 10,
-		bottom: 10
+		right: 0,
+		bottom: 0
 	},
 	remoteGrid: {
 		flex: 1,
@@ -246,10 +253,10 @@ const styles = StyleSheet.create({
 	},
 	remoteVideo: {
 		marginTop: 20,
-		marginLeft: 10,
-		marginRight: 10,
-		width: 100, //width,
-		height: 120 //height,
+		marginLeft: 0,
+		marginRight: 0,
+		width: width,
+		height: height
 	},
 	optionsContainer: {
 		position: "absolute",
