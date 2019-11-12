@@ -40,7 +40,7 @@ export default class Example extends Component {
 
 	_onConnectButtonPress = () => {
 		let token;
-		fetch("http://192.168.1.117:3000/token")
+		fetch("http://localhost:3000/token")
 			.then(response => response.json())
 			.then(data => {
 				console.log("Data:", data);
